@@ -1,6 +1,6 @@
 # Alocar
 
-[![CI](https://github.com/OWNER/REPO/actions/workflows/ci.yml/badge.svg)](https://github.com/OWNER/REPO/actions/workflows/ci.yml)
+[![CI](https://github.com/pedroo-goncalves/Alocar/actions/workflows/ci.yml/badge.svg)](https://github.com/pedroo-goncalves/Alocar/actions/workflows/ci.yml)
 
 ## Project abstract
 
