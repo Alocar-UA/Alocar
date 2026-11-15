@@ -1,0 +1,8 @@
+# Minimum tool versions to develop Alocar (one "tool=version" per line).
+# Library dependencies live in backend/pom.xml and frontend/package.json; Maven comes with ./mvnw.
+# Check and install with: ./scripts/setup-dev.sh   (only check: ./scripts/setup-dev.sh --check)
+git=2.30
+java=21
+node=22.12
+docker=24.0
+docker-compose=2.20
