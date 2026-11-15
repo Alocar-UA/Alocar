@@ -11,7 +11,7 @@
 6. Merge with a merge commit (keeps the test-first commits as TDD evidence); the branch is deleted.
 
 `main` is protected: no direct pushes, merges only through pull requests with passing checks
-(`backend`, `frontend`, `smoke-test`, `dependency-review`) and one approval.
+(`backend`, `frontend`, `smoke-test`, `dependency-scan`) and one approval.
 
 ## Code style
 
