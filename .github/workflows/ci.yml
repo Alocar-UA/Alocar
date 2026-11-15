@@ -63,21 +63,20 @@ jobs:
           cache: npm
           cache-dependency-path: frontend/package-lock.json
       - run: npm ci
-      - run: npm audit --omit=dev --audit-level=high # runtime deps; dev tooling is updated by Dependabot
       - run: npm run lint
       - run: npm run format:check
       - run: npm test
       - run: npm run build
 
-  dependency-review:
-    name: dependency-review
-    if: github.event_name == 'pull_request'
+  dependency-scan:
+    name: dependency-scan
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/dependency-review-action@v4
-        with:
-          fail-on-severity: high
+      - name: Scan backend and frontend dependencies for known vulnerabilities (OSV)
+        run: >
+          docker run --rm -v "$PWD":/src:ro ghcr.io/google/osv-scanner:v2.7.0
+          scan source --recursive /src/backend /src/frontend
 
   smoke-test:
     name: smoke-test
