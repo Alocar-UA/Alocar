@@ -18,6 +18,7 @@
         <springdoc.version>3.2.0</springdoc.version>
         <jacoco.version>0.8.13</jacoco.version>
         <sonar-maven-plugin.version>5.1.0.4751</sonar-maven-plugin.version>
+        <xray-junit-extensions.version>1.1.0</xray-junit-extensions.version>
         <sonar.coverage.jacoco.xmlReportPaths>${project.build.directory}/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
     </properties>
     <dependencies>
@@ -70,6 +71,14 @@
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>testcontainers-postgresql</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- Enhanced JUnit XML reports for Xray (Jira test management); configured in
+             src/test/resources/xray-junit-extensions.properties -->
+        <dependency>
+            <groupId>app.getxray</groupId>
+            <artifactId>xray-junit-extensions</artifactId>
+            <version>${xray-junit-extensions.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
