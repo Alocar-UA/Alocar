@@ -30,7 +30,7 @@ jobs:
       - name: Build, unit and integration tests, coverage
         run: ./mvnw -B verify
       # Sends the test results to Xray: one Test Execution per run in Jira project SCRUM,
-      # added to Test Plan SCRUM-8. Runs for pull requests and main only (not for every
+      # added to Test Plan SCRUM-106. Runs for pull requests and main only (not for every
       # branch push), even when tests fail; skipped when the Xray secrets are unavailable
       # (e.g. Dependabot PRs).
       - name: Import test results into Xray
@@ -47,7 +47,7 @@ jobs:
           testFormat: junit
           testPaths: backend/target/xray-reports/*.xml
           projectKey: SCRUM
-          testPlanKey: SCRUM-8
+          testPlanKey: SCRUM-106
           combineInSingleTestExec: 'true'
           failOnImportError: 'true'
       - name: Upload test reports
