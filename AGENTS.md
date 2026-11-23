@@ -6,15 +6,22 @@ file must be fixed.
 
 ## Domain
 
-Alocar is a fleet-as-a-service platform for **residential condominiums** (TQS26 *Service pools*
-concretization). Use this vocabulary consistently:
+Alocar is a shared electric-scooter service for residents of residences and condominiums
+(TQS26 *Service pools* concretization), organised as a franchise network. The Product Specs report
+is the source of truth; its business rules are BR1–BR12. Use this vocabulary consistently:
 
-| Concept in the course brief | In Alocar                                      |
-| --------------------------- | ---------------------------------------------- |
-| Institutional client        | Condominium administration                     |
-| End user / staff member     | Resident                                       |
-| Department (quota holder)   | Apartment (*fração*)                           |
-| Hub per building            | Hub per building block (or the shared garage)  |
+| Concept in the course brief | In Alocar (code / UI)                                        |
+| --------------------------- | ------------------------------------------------------------ |
+| Service pool operator       | Franchisee (`franqueado`), one per city                      |
+| Institutional client        | Residence or condominium = subfleet (`Subfleet`, `subfrota`) |
+| End user / staff member     | Resident (`Resident`, `residente`)                           |
+| Pooled asset                | Electric scooter only (`Scooter`, `trotinete`)               |
+| Hub per building            | Hub of the residence, with opening hours (`Hub`)             |
+| Booking                     | Use (`Use`, `utilização`): no advance reservations           |
+
+Key rules: no reservations; the resident chooses the duration and pays it up front; return to the
+same hub; fine from 10 minutes late, growing with the delay; no deposit and no quotas; telemetry
+(location and speed) every 5 s.
 
 All names of people, companies, places and condominiums must be fictional. Use only synthetic data.
 
@@ -40,9 +47,10 @@ All names of people, companies, places and condominiums must be fictional. Use o
 
 ## Tests (definition of done)
 
-- Every business rule gets unit tests, including boundary values (e.g. 19 % refused / 20 % accepted).
+- Every business rule gets unit tests, including boundary values (e.g. BR8: 9 min 59 s late, no fine / 10 min 00 s, fine).
 - Persistence and REST endpoints get integration tests named `*IT` using Testcontainers PostgreSQL.
-- Core stories get Gherkin scenarios tagged with the rule IDs (`@BR3`) and the Jira key.
+- Core stories get Gherkin scenarios (Portuguese, `backend/src/test/resources/features`, run by `CucumberIT`)
+  tagged with the story and rule IDs (`@US03`, `@BR3`). Update `docs/traceability.md` in the same PR.
 - Do not delete, skip or weaken an existing test to make the build pass. Explain failing tests instead.
 - The build (`./mvnw verify`, frontend lint/test/build) must pass locally before opening a PR.
 
@@ -54,7 +62,7 @@ All names of people, companies, places and condominiums must be fictional. Use o
 
 ## Rules for agents
 
-- Work on a feature branch named `<JIRA-KEY>-short-description`; put the Jira key in commit messages and PR titles.
+- Work on a feature branch named `SCRUM-<n>-short-description`; put the Jira key in commit messages and PR titles.
 - Never merge, never push to `main`, never change branch protection or CI secrets. A human approves every PR.
 - Never put secrets, credentials or personal data in code, tests, logs or prompts.
 - Keep changes small and focused on one story; say in the PR which parts were AI-generated.
