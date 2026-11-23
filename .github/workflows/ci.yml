@@ -30,10 +30,12 @@ jobs:
       - name: Build, unit and integration tests, coverage
         run: ./mvnw -B verify
       # Sends the test results to Xray: one Test Execution per run in Jira project SCRUM,
-      # added to Test Plan SCRUM-8. Runs for pull requests and main only (not for every
-      # branch push), even when tests fail; skipped when the Xray secrets are unavailable
-      # (e.g. Dependabot PRs).
+      # added to the Test Plan in the repository variable XRAY_TEST_PLAN_KEY (none when unset).
+      # Runs for pull requests and main only (not for every branch push), even when tests fail;
+      # skipped when the Xray secrets are unavailable (e.g. Dependabot PRs). Reporting to Jira
+      # must not block merges, so an import error shows as a warning instead of failing the build.
       - name: Import test results into Xray
+        continue-on-error: true
         if: >-
           always()
           && env.XRAY_CLIENT_ID != ''
@@ -47,7 +49,7 @@ jobs:
           testFormat: junit
           testPaths: backend/target/xray-reports/*.xml
           projectKey: SCRUM
-          testPlanKey: SCRUM-8
+          testPlanKey: ${{ vars.XRAY_TEST_PLAN_KEY }}
           combineInSingleTestExec: 'true'
           failOnImportError: 'true'
       - name: Upload test reports
@@ -58,6 +60,13 @@ jobs:
           path: |
             backend/target/surefire-reports/
             backend/target/failsafe-reports/
+      - name: Upload acceptance test reports (Cucumber)
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: cucumber-reports
+          path: backend/target/cucumber-reports/
+          if-no-files-found: ignore
       # TODO: remove this condition once SonarCloud is set up, so a missing token fails the build.
       - name: SonarQube analysis and quality gate
         if: env.SONAR_TOKEN != ''
