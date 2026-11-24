@@ -11,7 +11,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.util.Locale;
 
-/** A resident of a client residence; belongs to that residence's subfleet (BR2). */
+/** A resident of a client residence; belongs to the subfleet whose join link they used (BR2). */
 @Entity
 @Table(name = "residents")
 public class Resident {
@@ -23,7 +23,7 @@ public class Resident {
     @Column(nullable = false)
     private String name;
 
-    @Column(unique = true)
+    @Column(nullable = false, unique = true)
     private String email;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -34,14 +34,10 @@ public class Resident {
         // required by JPA
     }
 
-    public Resident(String name, Subfleet subfleet) {
-        this.name = name;
-        this.subfleet = subfleet;
-    }
-
     public Resident(String name, String email, Subfleet subfleet) {
-        this(name, subfleet);
+        this.name = name;
         this.email = email.strip().toLowerCase(Locale.ROOT);
+        this.subfleet = subfleet;
     }
 
     public String getEmail() {
