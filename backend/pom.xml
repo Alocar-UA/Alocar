@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>4.1.2</version>
+        <version>4.2.0</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>pt.ua.tqs</groupId>
@@ -15,10 +15,10 @@
     <description>Alocar: shared electric scooters for residents of residences and condominiums</description>
     <properties>
         <java.version>21</java.version>
-        <springdoc.version>3.2.0</springdoc.version>
-        <jacoco.version>0.8.13</jacoco.version>
-        <sonar-maven-plugin.version>5.1.0.4751</sonar-maven-plugin.version>
-        <cucumber.version>7.34.9</cucumber.version>
+        <springdoc.version>3.2.1</springdoc.version>
+        <jacoco.version>0.8.16</jacoco.version>
+        <sonar-maven-plugin.version>5.9.0.7382</sonar-maven-plugin.version>
+        <cucumber.version>8.1.0</cucumber.version>
         <xray-junit-extensions.version>1.1.0</xray-junit-extensions.version>
         <sonar.coverage.jacoco.xmlReportPaths>${project.build.directory}/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
     </properties>
