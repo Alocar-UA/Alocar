@@ -29,4 +29,15 @@ class HubControllerIT {
                 .asArray()
                 .containsExactly("Hub Bloco A", "Hub Bloco B", "Hub Garagem Central");
     }
+
+    @Test
+    void listHubsShowsOpeningHoursAndFreeScooters() {
+        assertThat(mvc.get().uri("/api/v1/hubs"))
+                .hasStatus(HttpStatus.OK)
+                .bodyJson()
+                .hasPathSatisfying("$[0].openingTime", v -> assertThat(v).asString().isEqualTo("07:00:00"))
+                .hasPathSatisfying("$[0].closingTime", v -> assertThat(v).asString().isEqualTo("23:00:00"))
+                // Hub Bloco A has TR-001 and TR-002 free; TR-003 is in maintenance.
+                .hasPathSatisfying("$[0].availableScooters", v -> assertThat(v).asNumber().isEqualTo(2));
+    }
 }

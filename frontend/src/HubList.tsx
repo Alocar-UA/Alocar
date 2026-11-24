@@ -1,6 +1,17 @@
 import { useEffect, useState } from 'react';
 import { fetchHubs, type Hub } from './api';
 
+function openingHours(hub: Hub): string {
+  if (hub.openingTime === null || hub.closingTime === null) {
+    return 'aberto 24 horas';
+  }
+  return `aberto das ${hub.openingTime.slice(0, 5)} às ${hub.closingTime.slice(0, 5)}`;
+}
+
+function freeScooters(count: number): string {
+  return count === 1 ? '1 trotinete livre' : `${count} trotinetes livres`;
+}
+
 type State =
   { status: 'loading' } | { status: 'error'; message: string } | { status: 'loaded'; hubs: Hub[] };
 
@@ -26,7 +37,7 @@ export function HubList() {
     <ul aria-label="Hubs">
       {state.hubs.map((hub) => (
         <li key={hub.id}>
-          <strong>{hub.name}</strong> — bloco {hub.block}, capacidade {hub.capacity}
+          <strong>{hub.name}</strong> — {freeScooters(hub.availableScooters)}, {openingHours(hub)}
         </li>
       ))}
     </ul>
