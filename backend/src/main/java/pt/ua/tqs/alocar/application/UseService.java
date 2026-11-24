@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pt.ua.tqs.alocar.application.port.PaymentGateway;
 import pt.ua.tqs.alocar.domain.Hub;
+import pt.ua.tqs.alocar.domain.Payment;
+import pt.ua.tqs.alocar.domain.PaymentRepository;
 import pt.ua.tqs.alocar.domain.Resident;
 import pt.ua.tqs.alocar.domain.ResidentRepository;
 import pt.ua.tqs.alocar.domain.Scooter;
@@ -34,6 +36,7 @@ public class UseService {
             UseRepository useRepository,
             ScooterRepository scooterRepository,
             ResidentRepository residentRepository,
+            PaymentRepository paymentRepository,
             PaymentGateway paymentGateway,
             Tariff tariff,
             Clock clock) {
@@ -114,5 +117,9 @@ public class UseService {
             throw new NotFoundException("Resident " + residentId + " not found");
         }
         return useRepository.findByResidentIdOrderByStartedAtDesc(residentId);
+    }
+
+    public List<Payment> payments(Long residentId) {
+        return List.of();
     }
 }
