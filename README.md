@@ -31,7 +31,10 @@ right away) and return them to a hub. The condominium administration sets the ru
 - Static analysis dashboard (SonarCloud): _TBD_
 - Observability dashboard: _TBD_
 - Deployed application: _TBD_
-- Reports: [`docs/`](docs/)
+- Reports ([`docs/`](docs/README.md)):
+  - Product Specification: [PDF](docs/reports/Alocar-Product-Specs.pdf) · [DOCX](docs/reports/Alocar-Product-Specs.docx)
+  - QA Manual v1: [PDF](docs/reports/Alocar-QA-Manual-v1.pdf) · [DOCX](docs/reports/Alocar-QA-Manual-v1.docx)
+  - Diagrams: [domain classes](docs/diagrams/class-diagram.png) · [scooter states](docs/diagrams/scooter-state-diagram.png)
 
 ## Repository layout
 
@@ -39,7 +42,7 @@ right away) and return them to a hub. The condominium administration sets the ru
 | ----------- | ----------------------------------------------------------- |
 | `backend/`  | Spring Boot 4 / Java 21 REST API (Maven)                    |
 | `frontend/` | React + Vite + TypeScript web UI                            |
-| `docs/`     | Assignment guidelines, report templates and our reports     |
+| `docs/`     | Our reports (`reports/`), diagrams (`diagrams/`), course material |
 | `.github/`  | CI workflow, Dependabot, pull request template              |
 
 ## Running locally
