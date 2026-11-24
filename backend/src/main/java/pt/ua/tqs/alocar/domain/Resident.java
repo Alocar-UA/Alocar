@@ -35,6 +35,14 @@ public class Resident {
         this.subfleet = subfleet;
     }
 
+    public Resident(String name, String email, Subfleet subfleet) {
+        this(name, subfleet);
+    }
+
+    public String getEmail() {
+        return null;
+    }
+
     public Long getId() {
         return id;
     }
