@@ -3,9 +3,9 @@
 ## Workflow (GitHub flow)
 
 1. Pick a story in Jira and move it to *In Progress*.
-2. Create a branch from `main` named after the story: `ALOC-12-book-vehicle`.
-3. Commit in small steps; every commit message starts with the Jira key: `ALOC-12 Add overlap check`.
-   With TDD, commit the failing test first (`ALOC-12 test: ...`), then the implementation.
+2. Create a branch from `main` named after the story: `SCRUM-12-start-use`.
+3. Commit in small steps; every commit message starts with the Jira key: `SCRUM-12 Refuse a second active use`.
+   With TDD, commit the failing test first (`SCRUM-12 test: ...`), then the implementation.
 4. Open a pull request whose title starts with the Jira key and fill in the template.
 5. CI must be green (build, tests, SonarQube quality gate) and one other team member must approve.
 6. Merge with a merge commit (keeps the test-first commits as TDD evidence); the branch is deleted.
@@ -29,6 +29,7 @@
 | Unit        | `backend/src/test`, `*Test`        | `./mvnw test`, every push |
 | Integration | `backend/src/test`, `*IT`          | `./mvnw verify`, every push |
 | Frontend    | `frontend/src/**/*.test.tsx`       | `npm test`, every push    |
+| Acceptance  | `backend/src/test/resources/features/*.feature` (Gherkin, run by `CucumberIT`) | `./mvnw verify`, every push |
 | E2E / load  | added in later iterations          | not on every build        |
 
 ## Review checklist

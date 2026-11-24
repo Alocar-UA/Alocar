@@ -4,15 +4,19 @@
 
 ## Project abstract
 
-**Alocar** is a light-mobility fleet-as-a-service platform for residential condominiums
-(TQS 2026 group project, *Service pools* concretization).
+**Alocar** is a shared electric-scooter service for residents of residences and condominiums
+(TQS 2026 group project, *Service pools* concretization), run as a franchise network with one
+franchise per city.
 
-An operator supplies and maintains a shared fleet of e-bikes, cargo bikes and scooters for a
-condominium. Residents book vehicles at the hub of their building for a time slot (or take one
-right away) and return them to a hub. The condominium administration sets the rules of use
-(maximum booking length, vehicle types allowed, hub capacity) and the **quotas per apartment
-(fração)**, and follows KPIs. The core business rules are **overlapping bookings** and
-**quotas per apartment**.
+Each client residence (a *subfleet*) has a hub with scooters. A resident signs up through the
+residence's link, picks a free scooter at the hub (no advance booking), chooses how long they will
+use it and pays that time up front, then returns it to the same hub. Returning it 10 minutes late or
+more costs a fine that grows with the delay. Scooters send their location and speed every 5 seconds,
+used to confirm returns and to detect possible theft. The franchisee pays the residence owner, as
+with a vending machine.
+
+The product specification (stories US01–US10, business rules BR1–BR12) is in the Product Specs
+report; [`docs/traceability.md`](docs/traceability.md) maps the rules to their tests.
 
 ## Project team
 
@@ -25,7 +29,7 @@ right away) and return them to a hub. The condominium administration sets the ru
 
 ## Project bookmarks
 
-- Jira backlog: _TBD_
+- Jira backlog: project `SCRUM` (Xray test plan in the repository variable `XRAY_TEST_PLAN_KEY`)
 - Related repositories: none (single repository)
 - API documentation (OpenAPI / Swagger UI): local http://localhost:8080/swagger-ui.html, deployed _TBD_
 - Static analysis dashboard (SonarCloud): _TBD_
@@ -60,7 +64,8 @@ cp .env.example .env   # then set DB_PASSWORD
 docker compose up --build
 # UI: http://localhost   API docs: http://localhost:8080/swagger-ui.html   Health: http://localhost:8080/actuator/health
 
-# Backend only: unit tests (Surefire) + integration tests with Testcontainers (Failsafe) + JaCoCo
+# Backend only: unit tests (Surefire) + integration and Gherkin acceptance tests with
+# Testcontainers (Failsafe) + JaCoCo. Cucumber reports: backend/target/cucumber-reports/
 cd backend && ./mvnw verify
 
 # Frontend only

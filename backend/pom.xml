@@ -12,12 +12,13 @@
     <artifactId>alocar</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>alocar</name>
-    <description>Alocar: light-mobility fleet-as-a-service for residential condominiums</description>
+    <description>Alocar: shared electric scooters for residents of residences and condominiums</description>
     <properties>
         <java.version>21</java.version>
         <springdoc.version>3.2.0</springdoc.version>
         <jacoco.version>0.8.13</jacoco.version>
         <sonar-maven-plugin.version>5.1.0.4751</sonar-maven-plugin.version>
+        <cucumber.version>7.34.9</cucumber.version>
         <xray-junit-extensions.version>1.1.0</xray-junit-extensions.version>
         <sonar.coverage.jacoco.xmlReportPaths>${project.build.directory}/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
     </properties>
@@ -37,6 +38,10 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webmvc</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springdoc</groupId>
@@ -73,6 +78,27 @@
             <artifactId>testcontainers-postgresql</artifactId>
             <scope>test</scope>
         </dependency>
+        <!-- Acceptance tests: Gherkin scenarios (src/test/resources/features) run by CucumberIT -->
+        <dependency>
+            <groupId>io.cucumber</groupId>
+            <artifactId>cucumber-java</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.cucumber</groupId>
+            <artifactId>cucumber-spring</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.cucumber</groupId>
+            <artifactId>cucumber-junit-platform-engine</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-suite</artifactId>
+            <scope>test</scope>
+        </dependency>
         <!-- Enhanced JUnit XML reports for Xray (Jira test management); configured in
              src/test/resources/xray-junit-extensions.properties -->
         <dependency>
@@ -82,6 +108,18 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>io.cucumber</groupId>
+                <artifactId>cucumber-bom</artifactId>
+                <version>${cucumber.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <build>
         <plugins>
