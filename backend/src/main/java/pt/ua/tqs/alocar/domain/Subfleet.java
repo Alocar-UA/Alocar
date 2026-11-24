@@ -39,6 +39,10 @@ public class Subfleet {
         return null;
     }
 
+    public boolean isJoinLinkActive() {
+        return false;
+    }
+
     public void disableJoinLink() {
         // not implemented yet (US01)
     }
