@@ -68,8 +68,12 @@ jobs:
           path: backend/target/cucumber-reports/
           if-no-files-found: ignore
       # TODO: remove this condition once SonarCloud is set up, so a missing token fails the build.
+      # Pull requests and main only: the SonarQube Cloud free plan cannot report the quality
+      # gate of other branches ("not allowed to access data from non main branches").
       - name: SonarQube analysis and quality gate
-        if: env.SONAR_TOKEN != ''
+        if: >-
+          env.SONAR_TOKEN != '' &&
+          (github.event_name == 'pull_request' || github.ref == 'refs/heads/main')
         run: >
           ./mvnw -B sonar:sonar
           -Dsonar.host.url=https://sonarcloud.io
