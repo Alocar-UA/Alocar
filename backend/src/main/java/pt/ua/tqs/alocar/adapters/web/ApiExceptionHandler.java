@@ -6,6 +6,7 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import pt.ua.tqs.alocar.application.BusinessRuleException;
+import pt.ua.tqs.alocar.application.JoinLinkDisabledException;
 import pt.ua.tqs.alocar.application.NotFoundException;
 import pt.ua.tqs.alocar.application.PaymentDeclinedException;
 
@@ -23,6 +24,12 @@ public class ApiExceptionHandler {
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, e.getMessage());
         problem.setProperty("rule", e.getRule());
         return problem;
+    }
+
+    /** UC1: the join link existed but was disabled. */
+    @ExceptionHandler(JoinLinkDisabledException.class)
+    ProblemDetail joinLinkDisabled(JoinLinkDisabledException e) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.GONE, e.getMessage());
     }
 
     @ExceptionHandler(PaymentDeclinedException.class)
