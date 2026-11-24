@@ -22,7 +22,7 @@ import pt.ua.tqs.alocar.domain.Tariff;
 import pt.ua.tqs.alocar.domain.Use;
 import pt.ua.tqs.alocar.domain.UseRepository;
 
-/** Use cases UC2 (start a use), UC3 (return the scooter) and UC4 (history). */
+/** Use cases UC2 (start a use), UC3 (return the scooter) and UC4 (history of uses and payments). */
 @Service
 @Transactional
 public class UseService {
@@ -110,10 +110,7 @@ public class UseService {
         use.getScooter().giveBack();
         use.end(now, fine);
         if (fine > 0) {
-            boolean paid = paymentGateway.charge(
-                    use.getResident().getId(), fine, "Coima da trotinete " + use.getScooter().getCode());
-            paymentRepository.save(
-                    new Payment(use, PaymentKind.FINE, fine, paid ? PaymentStatus.PAID : PaymentStatus.DECLINED, now));
+            chargeFine(use, fine, now);
         }
         return use;
     }
@@ -126,18 +123,28 @@ public class UseService {
     /** UC4 / US06: current and previous uses, most recent first. */
     @Transactional(readOnly = true)
     public List<Use> history(Long residentId) {
-        if (!residentRepository.existsById(residentId)) {
-            throw new NotFoundException("Resident " + residentId + " not found");
-        }
+        requireResident(residentId);
         return useRepository.findByResidentIdOrderByStartedAtDesc(residentId);
     }
 
     /** UC4 / US06: the resident's payments (durations and fines), most recent first. */
     @Transactional(readOnly = true)
     public List<Payment> payments(Long residentId) {
+        requireResident(residentId);
+        return paymentRepository.findByResidentIdOrderByCreatedAtDescIdDesc(residentId);
+    }
+
+    /** BR8: the fine is charged when the scooter is back; if declined it is recorded as owed. */
+    private void chargeFine(Use use, long fine, Instant now) {
+        boolean paid = paymentGateway.charge(
+                use.getResident().getId(), fine, "Coima da trotinete " + use.getScooter().getCode());
+        paymentRepository.save(
+                new Payment(use, PaymentKind.FINE, fine, paid ? PaymentStatus.PAID : PaymentStatus.DECLINED, now));
+    }
+
+    private void requireResident(Long residentId) {
         if (!residentRepository.existsById(residentId)) {
             throw new NotFoundException("Resident " + residentId + " not found");
         }
-        return paymentRepository.findByResidentIdOrderByCreatedAtDescIdDesc(residentId);
     }
 }
