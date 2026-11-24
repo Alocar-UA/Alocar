@@ -34,4 +34,12 @@ public class Subfleet {
     public String getName() {
         return name;
     }
+
+    public String getJoinToken() {
+        return null;
+    }
+
+    public void disableJoinLink() {
+        // not implemented yet (US01)
+    }
 }
