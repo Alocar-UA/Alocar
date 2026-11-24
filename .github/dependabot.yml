@@ -1,17 +1,17 @@
-# Dependabot: kept deliberately quiet.
+# Dependabot: kept deliberately quiet. At most one PR per ecosystem per month.
 # - One grouped PR per ecosystem, minor and patch updates only.
+# - npm: only runtime dependencies (react, react-dom). Dev tooling (eslint, vitest,
+#   typescript, @types/*, ...) is never shipped to users, so its bumps are just noise.
 # - Major updates (React 19, TypeScript 7, Java 25, Node 26, ...) are ignored here:
 #   the team upgrades those on purpose, in their own branch, when the sprint allows.
-# - Known vulnerabilities are still caught on every push by the OSV-Scanner job in CI.
+# - Known vulnerabilities are still caught on every pull request by the OSV-Scanner job in CI
+#   (Dependabot alerts are off for this repo, so that is the single source).
 version: 2
 updates:
   - package-ecosystem: maven
     directory: /backend
     schedule:
-      interval: weekly
-      day: monday
-      time: "08:00"
-      timezone: Europe/Lisbon
+      interval: monthly
     open-pull-requests-limit: 1
     labels: [dependencies]
     commit-message:
@@ -26,11 +26,10 @@ updates:
   - package-ecosystem: npm
     directory: /frontend
     schedule:
-      interval: weekly
-      day: monday
-      time: "08:00"
-      timezone: Europe/Lisbon
+      interval: monthly
     open-pull-requests-limit: 1
+    allow:
+      - dependency-type: production
     labels: [dependencies]
     commit-message:
       prefix: "chore(deps)"
