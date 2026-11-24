@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import java.util.Locale;
 
 /** A resident of a client residence; belongs to that residence's subfleet (BR2). */
 @Entity
@@ -21,6 +22,9 @@ public class Resident {
 
     @Column(nullable = false)
     private String name;
+
+    @Column(unique = true)
+    private String email;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "subfleet_id")
@@ -37,10 +41,11 @@ public class Resident {
 
     public Resident(String name, String email, Subfleet subfleet) {
         this(name, subfleet);
+        this.email = email.strip().toLowerCase(Locale.ROOT);
     }
 
     public String getEmail() {
-        return null;
+        return email;
     }
 
     public Long getId() {
