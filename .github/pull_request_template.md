@@ -1,14 +1,15 @@
-<!-- Title must start with the Jira key, e.g. "ALOC-12 Book a vehicle for a time slot" -->
+<!-- Title must start with the Jira key, e.g. "SCRUM-12 Start a use of a scooter" -->
 
 ## What and why
 
-Jira: ALOC-
+Jira: SCRUM-
 
 ## How it was tested
 
 - [ ] Unit tests
 - [ ] Integration tests
 - [ ] Gherkin / acceptance scenarios (if the story has them)
+- [ ] `docs/traceability.md` updated
 - [ ] Manually checked in the UI (if UI changes)
 
 ## Checklist
