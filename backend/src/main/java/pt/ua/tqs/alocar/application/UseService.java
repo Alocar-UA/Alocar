@@ -6,6 +6,8 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pt.ua.tqs.alocar.application.port.PaymentGateway;
@@ -26,6 +28,8 @@ import pt.ua.tqs.alocar.domain.UseRepository;
 @Service
 @Transactional
 public class UseService {
+
+    private static final Logger LOG = LoggerFactory.getLogger(UseService.class);
 
     private final UseRepository useRepository;
     private final ScooterRepository scooterRepository;
@@ -91,13 +95,17 @@ public class UseService {
         }
         scooter.pickUp();
         Use use = useRepository.save(new Use(resident, scooter, clock.instant(), durationMinutes, price));
-        paymentRepository.save(new Payment(use, PaymentKind.USE, price, PaymentStatus.PAID, use.getStartedAt()));
+        if (price > 0) {
+            paymentRepository.save(new Payment(use, PaymentKind.USE, price, PaymentStatus.PAID, use.getStartedAt()));
+        }
         return use;
     }
 
     /** UC3 / US04: the resident returns the scooter at the pick-up hub; a fine applies from 10 min late. */
     public Use returnScooter(Long useId, Long hubId) {
-        Use use = get(useId);
+        Use use = useRepository
+                .findByIdForUpdate(useId)
+                .orElseThrow(() -> new NotFoundException("Use " + useId + " not found"));
         if (!use.isActive()) {
             throw new BusinessRuleException("USE_ENDED", "A utilização já terminou");
         }
@@ -134,10 +142,19 @@ public class UseService {
         return paymentRepository.findByResidentIdOrderByCreatedAtDescIdDesc(residentId);
     }
 
-    /** BR8: the fine is charged when the scooter is back; if declined it is recorded as owed. */
+    /**
+     * BR8: the fine is charged when the scooter is back. If it is declined, or the payment service
+     * fails, the return still goes through and the fine is recorded as owed.
+     */
     private void chargeFine(Use use, long fine, Instant now) {
-        boolean paid = paymentGateway.charge(
-                use.getResident().getId(), fine, "Coima da trotinete " + use.getScooter().getCode());
+        boolean paid;
+        try {
+            paid = paymentGateway.charge(
+                    use.getResident().getId(), fine, "Coima da trotinete " + use.getScooter().getCode());
+        } catch (RuntimeException e) {
+            LOG.warn("Fine of use {} not charged, payment service failed: {}", use.getId(), e.getMessage());
+            paid = false;
+        }
         paymentRepository.save(
                 new Payment(use, PaymentKind.FINE, fine, paid ? PaymentStatus.PAID : PaymentStatus.DECLINED, now));
     }

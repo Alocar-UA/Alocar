@@ -27,7 +27,7 @@ JUnit com `@Requirement("SCRUM-n")` (xray-junit-extensions) para o Xray fazer es
 | BR5 | A utilização acaba antes de o hub fechar (22:00 + 60 aceite, 61 recusado) | `HubOpeningHoursTest.br5*`, `UseServiceTest.br5UseMustEndBeforeTheHubCloses` | `@BR5` em US03 |
 | BR6 | Uma utilização ativa por residente | `UseServiceTest.br6SecondActiveUseIsRefused` | `@BR6` em US03, `UseControllerIT.br6SecondActiveUseIsRefused` |
 | BR7 | Devolução no hub de levantamento | `UseServiceTest.br7ReturnAtAnotherHubIsRefused` | `@BR7` em US04, `UseControllerIT.br7ReturnAtAnotherHubIsRefused` |
-| BR8 | Sem coima abaixo de 10 min; coima por minuto a partir de 10 min, cobrada na devolução | `TariffTest.br8*`, `UseServiceTest.br8*`, `UseServiceTest.declinedFineEndsTheUseAndIsRecordedAsDeclined` | `@BR8` em US04 e US06 |
+| BR8 | Sem coima abaixo de 10 min; coima por minuto a partir de 10 min, cobrada na devolução | `TariffTest.br8*`, `UseServiceTest.br8*`, `UseServiceTest.declinedFineEndsTheUseAndIsRecordedAsDeclined`, `UseServiceTest.paymentServiceOutageEndsTheUseAndRecordsTheFineAsOwed` | `@BR8` em US04 e US06 |
 | BR1, BR9–BR12 | Transferências, telemetria, alerta de roubo, avarias, âmbito por papel | — | Por implementar |
 
 ## Ainda em aberto
@@ -41,5 +41,5 @@ JUnit com `@Requirement("SCRUM-n")` (xray-junit-extensions) para o Xray fazer es
   404, link desativado 410, email já registado 409 (BR2).
 - Pagamento: `SandboxPaymentGateway` aprova tudo. Desde a US06 cada cobrança fica em `payments`
   (duração paga no levantamento e coima cobrada na devolução); uma coima recusada termina na mesma a
-  utilização e fica registada como `DECLINED` (em dívida). Falta decidir com o grupo o que acontece a
+  utilização e fica registada como `DECLINED` (em dívida); o mesmo se o serviço de pagamentos falhar. Falta decidir com o grupo o que acontece a
   quem tem coimas em dívida (por exemplo, impedir nova utilização).

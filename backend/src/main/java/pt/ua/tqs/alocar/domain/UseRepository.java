@@ -1,9 +1,11 @@
 package pt.ua.tqs.alocar.domain;
 
+import jakarta.persistence.LockModeType;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 
 public interface UseRepository extends JpaRepository<Use, Long> {
@@ -18,6 +20,8 @@ public interface UseRepository extends JpaRepository<Use, Long> {
     @EntityGraph(attributePaths = "scooter")
     List<Use> findByResidentIdOrderByStartedAtDesc(Long residentId);
 
-    @Query("select u from Use u where u.id = :id")
+    /** Locks the row so two returns of the same use run one after the other (one fine, one charge). */
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select u from Use u join fetch u.scooter where u.id = :id")
     Optional<Use> findByIdForUpdate(Long id);
 }
