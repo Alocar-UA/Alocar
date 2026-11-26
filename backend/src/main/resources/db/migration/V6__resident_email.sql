@@ -3,7 +3,8 @@
 ALTER TABLE residents ADD COLUMN email VARCHAR(254);
 
 -- Synthetic addresses for the seeded residents (fictional data).
-UPDATE residents SET email = lower(replace(name, ' ', '.')) || '@exemplo.pt';
+-- The id keeps them unique even when two residents share a name.
+UPDATE residents SET email = lower(replace(name, ' ', '.')) || '.' || id || '@exemplo.pt';
 
 ALTER TABLE residents ALTER COLUMN email SET NOT NULL;
 ALTER TABLE residents ADD CONSTRAINT residents_email_key UNIQUE (email);

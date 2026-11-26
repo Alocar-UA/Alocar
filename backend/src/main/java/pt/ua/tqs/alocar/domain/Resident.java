@@ -35,7 +35,7 @@ public class Resident {
     }
 
     public Resident(String name, String email, Subfleet subfleet) {
-        this.name = name;
+        this.name = name.strip();
         this.email = email.strip().toLowerCase(Locale.ROOT);
         this.subfleet = subfleet;
     }

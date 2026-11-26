@@ -1,5 +1,6 @@
 package pt.ua.tqs.alocar.application;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pt.ua.tqs.alocar.domain.Resident;
@@ -32,6 +33,11 @@ public class ResidentService {
         if (residentRepository.existsByEmail(resident.getEmail())) {
             throw new BusinessRuleException("BR2", "Já existe uma conta com este email");
         }
-        return residentRepository.save(resident);
+        try {
+            return residentRepository.saveAndFlush(resident);
+        } catch (DataIntegrityViolationException e) {
+            // Another sign-up with this email committed between the check and the insert.
+            throw new BusinessRuleException("BR2", "Já existe uma conta com este email");
+        }
     }
 }
