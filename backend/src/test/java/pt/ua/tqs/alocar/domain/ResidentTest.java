@@ -22,4 +22,9 @@ class ResidentTest {
 
         assertThat(marta.getEmail()).isEqualTo("marta.lopes@exemplo.pt");
     }
+
+    @Test
+    void nameIsKeptWithoutSurroundingSpaces() {
+        assertThat(new Resident("  Marta Lopes  ", "marta@exemplo.pt", riaNova).getName()).isEqualTo("Marta Lopes");
+    }
 }

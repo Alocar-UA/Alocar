@@ -68,12 +68,22 @@ class ResidentControllerIT {
 
     @Test
     void br2SecondAccountWithTheSameEmailIsRefused() {
-        signUp(acaciasJoinToken, "Marta Lopes", "marta@teste.exemplo.pt");
+        assertThat(signUp(acaciasJoinToken, "Marta Lopes", "marta@teste.exemplo.pt")).hasStatus(201);
 
         MvcTestResult result = signUp(acaciasJoinToken, "Marta Lopes", "MARTA@teste.exemplo.pt");
 
         assertThat(result).hasStatus(409);
         assertThat(result).bodyJson().extractingPath("$.rule").isEqualTo("BR2");
+    }
+
+    /** The name and email are trimmed before validation, as the resident stores them. */
+    @Test
+    void surroundingSpacesInNameAndEmailAreIgnored() {
+        MvcTestResult result = signUp(acaciasJoinToken, "  Marta Lopes ", " Marta@teste.exemplo.pt ");
+
+        assertThat(result).hasStatus(201);
+        assertThat(result).bodyJson().extractingPath("$.name").isEqualTo("Marta Lopes");
+        assertThat(result).bodyJson().extractingPath("$.email").isEqualTo("marta@teste.exemplo.pt");
     }
 
     @Test

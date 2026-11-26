@@ -15,6 +15,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DataIntegrityViolationException;
 import pt.ua.tqs.alocar.domain.Resident;
 import pt.ua.tqs.alocar.domain.ResidentRepository;
 import pt.ua.tqs.alocar.domain.Subfleet;
@@ -39,7 +40,7 @@ class ResidentServiceTest {
     void setUp() {
         riaNova = new Subfleet("Residência Ria Nova");
         lenient().when(subfleetRepository.findByJoinToken(riaNova.getJoinToken())).thenReturn(Optional.of(riaNova));
-        lenient().when(residentRepository.save(any(Resident.class))).thenAnswer(call -> call.getArgument(0));
+        lenient().when(residentRepository.saveAndFlush(any(Resident.class))).thenAnswer(call -> call.getArgument(0));
     }
 
     @Test
@@ -48,7 +49,7 @@ class ResidentServiceTest {
 
         assertThat(marta.getSubfleet()).isSameAs(riaNova);
         assertThat(marta.getName()).isEqualTo("Marta Lopes");
-        verify(residentRepository).save(marta);
+        verify(residentRepository).saveAndFlush(marta);
     }
 
     @Test
@@ -57,7 +58,7 @@ class ResidentServiceTest {
 
         assertThatThrownBy(() -> service.signUp("link-que-nao-existe", "Marta Lopes", "marta@exemplo.pt"))
                 .isInstanceOf(NotFoundException.class);
-        verify(residentRepository, never()).save(any());
+        verify(residentRepository, never()).saveAndFlush(any());
     }
 
     @Test
@@ -66,7 +67,7 @@ class ResidentServiceTest {
 
         assertThatThrownBy(() -> service.signUp(riaNova.getJoinToken(), "Marta Lopes", "marta@exemplo.pt"))
                 .isInstanceOf(JoinLinkDisabledException.class);
-        verify(residentRepository, never()).save(any());
+        verify(residentRepository, never()).saveAndFlush(any());
     }
 
     /** BR2: one account, one subfleet; the email is compared in lower case. */
@@ -78,6 +79,18 @@ class ResidentServiceTest {
                 .isInstanceOf(BusinessRuleException.class)
                 .extracting("rule")
                 .isEqualTo("BR2");
-        verify(residentRepository, never()).save(any());
+        verify(residentRepository, never()).saveAndFlush(any());
+    }
+
+    /** BR2: two sign-ups with the same email at the same moment both pass the check; the database decides. */
+    @Test
+    void br2ConcurrentSignUpWithTheSameEmailIsRefused() {
+        when(residentRepository.saveAndFlush(any(Resident.class)))
+                .thenThrow(new DataIntegrityViolationException("residents_email_key"));
+
+        assertThatThrownBy(() -> service.signUp(riaNova.getJoinToken(), "Marta Lopes", "marta@exemplo.pt"))
+                .isInstanceOf(BusinessRuleException.class)
+                .extracting("rule")
+                .isEqualTo("BR2");
     }
 }
