@@ -80,7 +80,7 @@ public class UseSteps {
 
     @Dado("o residente {string} da residência {string}")
     public void resident(String name, String residence) {
-        residentByName.put(name, residents.save(new Resident(name, subfleetByName.get(residence))));
+        residentByName.put(name, residents.save(new Resident(name, emailOf(name), subfleetByName.get(residence))));
     }
 
     @Dado("que são {hora} de segunda-feira")
@@ -203,6 +203,11 @@ public class UseSteps {
                     .isEqualTo(ParameterTypes.cents(row.get("valor")));
             assertThat(payment.get("status")).isEqualTo("pago".equals(row.get("estado")) ? "PAID" : "DECLINED");
         }
+    }
+
+    /** "Tiago" in scenario 7 gets tiago.7@exemplo.pt, so accounts never clash between scenarios. */
+    private String emailOf(String name) {
+        return name.toLowerCase().replace(' ', '.') + "." + suffix.replace(" #", "") + "@exemplo.pt";
     }
 
     private Number jsonNumber(String path) {

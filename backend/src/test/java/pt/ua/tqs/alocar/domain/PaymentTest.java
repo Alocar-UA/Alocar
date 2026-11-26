@@ -19,7 +19,7 @@ class PaymentTest {
     void setUp() {
         Subfleet riaNova = new Subfleet("Residência Ria Nova");
         Hub hub = new Hub("Hub Ria Nova", "-", 10, riaNova, LocalTime.of(7, 0), LocalTime.of(23, 0));
-        Resident tiago = new Resident("Tiago Mendes", riaNova);
+        Resident tiago = new Resident("Tiago Mendes", "tiago.mendes@exemplo.pt", riaNova);
         use = new Use(tiago, new Scooter("RN-01", hub, ScooterStatus.IN_USE), NOW, 240, 1200);
     }
 
