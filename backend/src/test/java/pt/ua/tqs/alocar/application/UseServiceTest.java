@@ -22,11 +22,11 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import pt.ua.tqs.alocar.application.port.PaymentGateway;
-import org.mockito.ArgumentCaptor;
 import pt.ua.tqs.alocar.domain.Hub;
 import pt.ua.tqs.alocar.domain.Payment;
 import pt.ua.tqs.alocar.domain.PaymentKind;
@@ -81,6 +81,10 @@ class UseServiceTest {
     }
 
     private UseService serviceAt(int hour, int minute) {
+        return serviceAt(hour, minute, TARIFF);
+    }
+
+    private UseService serviceAt(int hour, int minute, Tariff tariff) {
         Instant now = ZonedDateTime.of(2026, 11, 23, hour, minute, 0, 0, LISBON).toInstant();
         return new UseService(
                 useRepository,
@@ -88,7 +92,7 @@ class UseServiceTest {
                 residentRepository,
                 paymentRepository,
                 paymentGateway,
-                TARIFF,
+                tariff,
                 Clock.fixed(now, LISBON));
     }
 
@@ -244,6 +248,52 @@ class UseServiceTest {
         assertThat(fine.getCreatedAt()).isEqualTo(use.getEndedAt());
     }
 
+    /** BR8 boundary: exactly 10 min 00 s late already charges the fine for 10 minutes. */
+    @Test
+    void br8Return10MinutesLateChargesTheFine() {
+        activeUseStartedAt(8, 35, 240);
+
+        serviceAt(12, 45).returnScooter(5L, 10L);
+
+        verify(paymentGateway).charge(eq(100L), eq(200L), anyString());
+        assertThat(savedPayment().getAmountCents()).isEqualTo(200);
+    }
+
+    /** A payment service outage must not keep the use open (the fine would keep growing). */
+    @Test
+    void paymentServiceOutageEndsTheUseAndRecordsTheFineAsOwed() {
+        Use use = activeUseStartedAt(8, 35, 240);
+        when(paymentGateway.charge(anyLong(), anyLong(), anyString()))
+                .thenThrow(new IllegalStateException("payment service unavailable"));
+
+        serviceAt(12, 49).returnScooter(5L, 10L);
+
+        assertThat(use.isActive()).isFalse();
+        assertThat(scooter.isAvailable()).isTrue();
+        assertThat(savedPayment().getStatus()).isEqualTo(PaymentStatus.DECLINED);
+    }
+
+    /** Two returns of the same use at once: the use is read with a lock, so only one ends it and pays. */
+    @Test
+    void returnReadsTheUseWithALock() {
+        activeUseStartedAt(8, 35, 240);
+
+        serviceAt(12, 49).returnScooter(5L, 10L);
+
+        verify(useRepository).findByIdForUpdate(5L);
+        verify(useRepository, never()).findById(5L);
+    }
+
+    /** With a tariff of 0 €/min nothing is charged, so there is no payment to record. */
+    @Test
+    void freeUseRecordsNoPayment() {
+        Tariff free = new Tariff(0, 20, Duration.ofMinutes(10), 10, 480);
+
+        assertThat(serviceAt(8, 35, free).start(100L, 1000L, 60).isActive()).isTrue();
+
+        verify(paymentRepository, never()).save(any());
+    }
+
     @Test
     void br8ReturnLessThan10MinutesLateChargesNothing() {
         activeUseStartedAt(8, 35, 240);
@@ -295,6 +345,7 @@ class UseServiceTest {
         Instant start = ZonedDateTime.of(2026, 11, 23, hour, minute, 0, 0, LISBON).toInstant();
         Use use = withId(new Use(tiago, scooter, start, durationMinutes, durationMinutes * 5L), 5L);
         lenient().when(useRepository.findById(5L)).thenReturn(Optional.of(use));
+        lenient().when(useRepository.findByIdForUpdate(5L)).thenReturn(Optional.of(use));
         return use;
     }
 

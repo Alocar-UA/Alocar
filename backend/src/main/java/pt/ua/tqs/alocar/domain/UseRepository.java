@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 public interface UseRepository extends JpaRepository<Use, Long> {
 
@@ -16,4 +17,7 @@ public interface UseRepository extends JpaRepository<Use, Long> {
 
     @EntityGraph(attributePaths = "scooter")
     List<Use> findByResidentIdOrderByStartedAtDesc(Long residentId);
+
+    @Query("select u from Use u where u.id = :id")
+    Optional<Use> findByIdForUpdate(Long id);
 }
