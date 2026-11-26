@@ -44,4 +44,10 @@ public class UseController {
     public List<UseResponse> history(@PathVariable Long residentId) {
         return useService.history(residentId).stream().map(UseResponse::from).toList();
     }
+
+    /** US06: the resident's payments (durations and fines), most recent first. */
+    @GetMapping("/api/v1/residents/{residentId}/payments")
+    public List<PaymentResponse> payments(@PathVariable Long residentId) {
+        return useService.payments(residentId).stream().map(PaymentResponse::from).toList();
+    }
 }

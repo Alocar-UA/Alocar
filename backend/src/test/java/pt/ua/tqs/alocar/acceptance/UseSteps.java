@@ -13,6 +13,7 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +32,7 @@ import pt.ua.tqs.alocar.domain.Subfleet;
 import pt.ua.tqs.alocar.domain.SubfleetRepository;
 
 /**
- * Steps for US03 (pick up) and US04 (return). Each scenario creates its own residence, hub, scooters
+ * Steps for US03 (pick up), US04 (return) and US06 (history of uses and payments). Each scenario creates its own residence, hub, scooters
  * and residents (names get a unique suffix in the database), so scenarios do not depend on each other.
  * Requests go through the REST API.
  */
@@ -155,6 +156,53 @@ public class UseSteps {
         assertThat(lastResult).hasStatus(200);
         assertThat(jsonNumber("$.lateMinutes").intValue()).isEqualTo(lateMinutes);
         assertThat(jsonNumber("$.fineCents").longValue()).isEqualTo(fineCents);
+    }
+
+    @Quando("o residente {string} consulta o histórico de utilizações")
+    public void residentListsUses(String resident) {
+        lastResult = mvc.get()
+                .uri("/api/v1/residents/{id}/uses", residentByName.get(resident).getId())
+                .exchange();
+    }
+
+    @Quando("o residente {string} consulta os pagamentos")
+    public void residentListsPayments(String resident) {
+        lastResult = mvc.get()
+                .uri("/api/v1/residents/{id}/payments", residentByName.get(resident).getId())
+                .exchange();
+    }
+
+    @Então("vê as utilizações:")
+    public void seesUses(List<Map<String, String>> expected) {
+        assertThat(lastResult).hasStatus(200);
+        List<Map<String, Object>> uses = json("$");
+        assertThat(uses).hasSameSizeAs(expected);
+        for (int i = 0; i < expected.size(); i++) {
+            Map<String, String> row = expected.get(i);
+            Map<String, Object> use = uses.get(i);
+            assertThat(use.get("scooterCode")).isEqualTo(row.get("trotinete") + suffix);
+            assertThat(use.get("active")).isEqualTo("em curso".equals(row.get("estado")));
+            assertThat(((Number) use.get("amountPaidCents")).longValue())
+                    .isEqualTo(ParameterTypes.cents(row.get("pago")));
+            assertThat(use.get("fineCents") == null ? null : ((Number) use.get("fineCents")).longValue())
+                    .isEqualTo(row.get("coima") == null ? null : ParameterTypes.cents(row.get("coima")));
+        }
+    }
+
+    @Então("vê os pagamentos:")
+    public void seesPayments(List<Map<String, String>> expected) {
+        assertThat(lastResult).hasStatus(200);
+        List<Map<String, Object>> payments = json("$");
+        assertThat(payments).hasSameSizeAs(expected);
+        for (int i = 0; i < expected.size(); i++) {
+            Map<String, String> row = expected.get(i);
+            Map<String, Object> payment = payments.get(i);
+            assertThat(payment.get("kind")).isEqualTo("coima".equals(row.get("tipo")) ? "FINE" : "USE");
+            assertThat(payment.get("scooterCode")).isEqualTo(row.get("trotinete") + suffix);
+            assertThat(((Number) payment.get("amountCents")).longValue())
+                    .isEqualTo(ParameterTypes.cents(row.get("valor")));
+            assertThat(payment.get("status")).isEqualTo("pago".equals(row.get("estado")) ? "PAID" : "DECLINED");
+        }
     }
 
     /** "Tiago" in scenario 7 gets tiago.7@exemplo.pt, so accounts never clash between scenarios. */

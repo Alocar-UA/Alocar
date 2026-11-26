@@ -15,6 +15,11 @@ public class ParameterTypes {
     /** An amount such as 12,00 €, in cents. */
     @ParameterType("\\d+,\\d{2} €")
     public Long euros(String value) {
+        return cents(value);
+    }
+
+    /** Converts 12,00 € to 1200 cents (also used for amounts in data tables). */
+    static long cents(String value) {
         String[] parts = value.replace(" €", "").split(",");
         return Long.parseLong(parts[0]) * 100 + Long.parseLong(parts[1]);
     }

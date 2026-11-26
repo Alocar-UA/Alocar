@@ -57,6 +57,7 @@ class UseControllerIT {
 
     @AfterEach
     void cleanUp() {
+        jdbc.update("DELETE FROM payments");
         jdbc.update("DELETE FROM uses");
         jdbc.update("UPDATE scooters SET status = 'AVAILABLE' WHERE status = 'IN_USE'");
     }
@@ -93,6 +94,37 @@ class UseControllerIT {
                 .hasStatus(HttpStatus.OK)
                 .bodyJson()
                 .hasPathSatisfying("$.fineCents", v -> assertThat(v).asNumber().isEqualTo(280));
+    }
+
+    /** US06: the duration paid at pick-up and the late fine charged at return, most recent first. */
+    @Test
+    void residentSeesTheDurationAndTheFineInThePayments() {
+        assertThat(startUse(tiago, tr001, 240)).hasStatus(HttpStatus.CREATED);
+        long useId = id("SELECT id FROM uses WHERE resident_id = " + tiago);
+        clock.setLocal(2026, 11, 23, 12, 49);
+        mvc.post()
+                .uri("/api/v1/uses/{id}/return", useId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"hubId\": " + hubA + "}")
+                .exchange();
+
+        assertThat(mvc.get().uri("/api/v1/residents/{id}/payments", tiago))
+                .hasStatus(HttpStatus.OK)
+                .bodyJson()
+                .hasPathSatisfying("$.length()", v -> assertThat(v).asNumber().isEqualTo(2))
+                .hasPathSatisfying("$[0].kind", v -> assertThat(v).asString().isEqualTo("FINE"))
+                .hasPathSatisfying("$[0].amountCents", v -> assertThat(v).asNumber().isEqualTo(280))
+                .hasPathSatisfying("$[0].status", v -> assertThat(v).asString().isEqualTo("PAID"))
+                .hasPathSatisfying("$[0].useId", v -> assertThat(v).asNumber().isEqualTo((int) useId))
+                .hasPathSatisfying("$[0].scooterCode", v -> assertThat(v).asString().isEqualTo("TR-001"))
+                .hasPathSatisfying("$[0].createdAt", v -> assertThat(v).asString().isEqualTo("2026-11-23T12:49:00Z"))
+                .hasPathSatisfying("$[1].kind", v -> assertThat(v).asString().isEqualTo("USE"))
+                .hasPathSatisfying("$[1].amountCents", v -> assertThat(v).asNumber().isEqualTo(1200));
+    }
+
+    @Test
+    void paymentsOfUnknownResidentAreNotFound() {
+        assertThat(mvc.get().uri("/api/v1/residents/{id}/payments", 999_999)).hasStatus(HttpStatus.NOT_FOUND);
     }
 
     @Test
