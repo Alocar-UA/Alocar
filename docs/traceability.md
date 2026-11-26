@@ -11,16 +11,17 @@ JUnit com `@Requirement("SCRUM-n")` (xray-junit-extensions) para o Xray fazer es
 
 | História | Jira | Estado | Testes de aceitação (Gherkin) | Testes de integração |
 | -------- | ---- | ------ | ----------------------------- | -------------------- |
-| US02 Ver trotinetes livres e horário do hub | SCRUM-? | Feito (API) | — | `HubControllerIT.listHubsShowsOpeningHoursAndFreeScooters`, `UseControllerIT.hubListsItsScootersWithStatus` |
-| US03 Levantar trotinete e pagar a duração | SCRUM-? | Feito (API) | `us03_levantar_trotinete.feature` (6 cenários) | `UseControllerIT` |
-| US04 Devolver no hub e ver a coima | SCRUM-? | Feito (API) | `us04_devolver_trotinete.feature` (5 cenários) | `UseControllerIT.residentPicksUpReturnsLateAndSeesTheFineInTheHistory` |
-| US06 Histórico de utilizações | SCRUM-? | Parcial (utilizações; pagamentos por fazer) | — | `UseControllerIT.residentPicksUpReturnsLateAndSeesTheFineInTheHistory` |
+| US01 Criar conta pelo link de adesão da residência | SCRUM-89 | Feito (API) | `us01_criar_conta.feature` (4 cenários) | `ResidentControllerIT` |
+| US02 Ver trotinetes livres e horário do hub | SCRUM-90 | Feito (API) | — | `HubControllerIT.listHubsShowsOpeningHoursAndFreeScooters`, `UseControllerIT.hubListsItsScootersWithStatus` |
+| US03 Levantar trotinete e pagar a duração | SCRUM-91 | Feito (API) | `us03_levantar_trotinete.feature` (6 cenários) | `UseControllerIT` |
+| US04 Devolver no hub e ver a coima | SCRUM-92 | Feito (API) | `us04_devolver_trotinete.feature` (5 cenários) | `UseControllerIT.residentPicksUpReturnsLateAndSeesTheFineInTheHistory` |
+| US06 Histórico de utilizações | SCRUM-94 | Parcial (utilizações; pagamentos por fazer) | — | `UseControllerIT.residentPicksUpReturnsLateAndSeesTheFineInTheHistory` |
 
 ## Regras de negócio
 
 | Regra | Resumo | Testes unitários | Aceitação / integração |
 | ----- | ------ | ---------------- | ---------------------- |
-| BR2 | Só usa trotinetes da subfrota da sua residência | `UseServiceTest.br2ScooterOfAnotherSubfleetIsRefused` | `@BR2` em US03 |
+| BR2 | Fica na subfrota do link de adesão (uma conta por email, uma subfrota) e só usa trotinetes dessa subfrota | `ResidentServiceTest.br2EmailAlreadyRegisteredIsRefused`, `ResidentTest`, `SubfleetTest`, `UseServiceTest.br2ScooterOfAnotherSubfleetIsRefused` | `@BR2` em US01 e US03, `ResidentControllerIT.br2SecondAccountWithTheSameEmailIsRefused` |
 | BR3 | Trotinete disponível, hub aberto (6:59 recusado, 7:00 aceite) | `HubOpeningHoursTest.br3StartAt659IsRefusedAndAt700IsAccepted`, `UseServiceTest.br3*` | `@BR3` em US03, `UseControllerIT.br3*` |
 | BR4 | Paga duração × tarifa; duração entre o mínimo e o máximo | `TariffTest.br4*`, `UseServiceTest.br4DurationOutsideTheLimitsIsRefused` | `@BR4` em US03 |
 | BR5 | A utilização acaba antes de o hub fechar (22:00 + 60 aceite, 61 recusado) | `HubOpeningHoursTest.br5*`, `UseServiceTest.br5UseMustEndBeforeTheHubCloses` | `@BR5` em US03 |
@@ -35,4 +36,7 @@ JUnit com `@Requirement("SCRUM-n")` (xray-junit-extensions) para o Xray fazer es
   localização enviada pelo simulador de frota.
 - Valores «proposta» em `application.properties` (`alocar.pricing.*`): 0,05 €/min, coima 0,20 € por
   minuto de atraso a partir de 10 min, duração entre 10 e 480 min. Confirmar com o grupo.
+- US01: ainda sem autenticação (palavra-passe/login fica para a história de autenticação); o
+  franqueado ainda não tem endpoint para gerar ou desativar o link (US10). Códigos: link inexistente
+  404, link desativado 410, email já registado 409 (BR2).
 - Pagamento: `SandboxPaymentGateway` aprova tudo; a coima fica registada mas ainda não é cobrada.

@@ -64,7 +64,7 @@ class UseServiceTest {
     void setUp() {
         acacias = withId(new Subfleet("Residencial Quinta das Acácias"), 1L);
         hubA = withId(new Hub("Hub Bloco A", "A", 8, acacias, LocalTime.of(7, 0), LocalTime.of(23, 0)), 10L);
-        tiago = withId(new Resident("Tiago Mendes", acacias), 100L);
+        tiago = withId(new Resident("Tiago Mendes", "tiago.mendes@exemplo.pt", acacias), 100L);
         scooter = withId(new Scooter("TR-001", hubA, ScooterStatus.AVAILABLE), 1000L);
         lenient().when(residentRepository.findById(100L)).thenReturn(Optional.of(tiago));
         lenient().when(scooterRepository.findById(1000L)).thenReturn(Optional.of(scooter));
