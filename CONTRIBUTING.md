@@ -26,10 +26,10 @@
 
 | Kind        | Where / naming                     | When it runs              |
 | ----------- | ---------------------------------- | ------------------------- |
-| Unit        | `backend/src/test`, `*Test`        | `./mvnw test`, every PR    |
-| Integration | `backend/src/test`, `*IT`          | `./mvnw verify`, every PR    |
-| Frontend    | `frontend/src/**/*.test.tsx`       | `npm test`, every PR    |
-| Acceptance  | `backend/src/test/resources/features/*.feature` (Gherkin, run by `CucumberIT`) | `./mvnw verify`, every PR    |
+| Unit        | `backend/src/test`, `*Test`        | `./mvnw test`, every push |
+| Integration | `backend/src/test`, `*IT`          | `./mvnw verify`, every push |
+| Frontend    | `frontend/src/**/*.test.tsx`       | `npm test`, every push    |
+| Acceptance  | `backend/src/test/resources/features/*.feature` (Gherkin, run by `CucumberIT`) | `./mvnw verify`, every push |
 | E2E / load  | added in later iterations          | not on every build        |
 
 ## Review checklist

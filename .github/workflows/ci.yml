@@ -1,18 +1,17 @@
 name: CI
 
-# Runs once per pull request (on every push to it) and once on main after a merge.
-# Branch pushes without a PR are not built, so a PR no longer shows every check twice.
+# CI on every push and on every pull request to main (practice D2), plus manual runs.
 on:
   push:
-    branches: [main]
   pull_request:
     branches: [main]
   workflow_dispatch:
 
-# A new push to the same PR cancels the run that is still going for the old commit.
+# A new push to the same branch or PR cancels the run still going for the old commit.
+# Runs on main are never cancelled.
 concurrency:
-  group: ci-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  group: ci-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 permissions:
   contents: read
