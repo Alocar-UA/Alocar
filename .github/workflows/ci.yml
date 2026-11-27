@@ -1,9 +1,17 @@
 name: CI
 
+# CI on every push and on every pull request to main (practice D2), plus manual runs.
 on:
   push:
   pull_request:
     branches: [main]
+  workflow_dispatch:
+
+# A new push to the same branch or PR cancels the run still going for the old commit.
+# Runs on main are never cancelled.
+concurrency:
+  group: ci-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 permissions:
   contents: read
